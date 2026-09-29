@@ -1,0 +1,22 @@
+Options -Indexes
+
+RewriteEngine On
+
+# Allow authorization headers
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+CGIPassAuth On
+
+# Extensionless PHP routing
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php [L]
+
+<FilesMatch "^\.env">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "^(config|database|logs|includes)/.*">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

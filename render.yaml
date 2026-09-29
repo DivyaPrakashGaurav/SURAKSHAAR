@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: surakshaar-admin
+    env: docker
+    region: oregon # or frankfurt, ohio, singapore
+    plan: free
+    envVars:
+      - key: SUPABASE_URL
+        sync: false # You will enter this value in the Render dashboard during setup
+      - key: SUPABASE_SECRET_KEY
+        sync: false # You will enter this value in the Render dashboard during setup

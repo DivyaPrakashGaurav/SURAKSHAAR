@@ -1,0 +1,27 @@
+<?php
+$env = file('.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+$vars = [];
+foreach ($env as $line) {
+    if (strpos(trim($line), '#') === 0) continue;
+    list($name, $value) = explode('=', $line, 2);
+    $vars[trim($name)] = trim($value);
+}
+$url = rtrim($vars['SUPABASE_URL'], '/') . '/rest/v1/rpc/exec_sql';
+$key = $vars['SUPABASE_SECRET_KEY'];
+
+$query = "
+ALTER TABLE workers ADD COLUMN IF NOT EXISTS session_token VARCHAR(255) UNIQUE;
+ALTER TABLE workers ADD COLUMN IF NOT EXISTS last_seen_at TIMESTAMP WITH TIME ZONE NULL;
+NOTIFY pgrst, 'reload schema';
+";
+
+$ch = curl_init($url);
+curl_setopt($ch, CURLOPT_HTTPHEADER, ['apikey: ' . $key, 'Authorization: Bearer ' . $key, 'Content-Type: application/json']);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['query' => $query]));
+$res = curl_exec($ch);
+echo "Response: " . $res . "\n";
