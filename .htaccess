@@ -1,0 +1,11 @@
+Options -Indexes
+
+<FilesMatch "^\.env">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "^(config|database|logs|includes)/.*">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
